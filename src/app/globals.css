@@ -1,0 +1,216 @@
+@import "tailwindcss";
+
+/*
+  Paleta da Marília Bezerra (sem logo próprio: tirada dos projetos dela):
+  - madeira natural e tons de areia que aparecem em quase todos os interiores (caramelo #8b6240);
+  - o verde-oliva das telas e estofados que ela usa como ponto de cor (#6e7550);
+  - marfim das paredes e do mármore (#f7f4ef) e o café escuro da marcenaria (#1c1916).
+  A referência (Serra) dá o layout: fundo claro com brilho quente, títulos em versalete serifada e blocos escuros.
+  Nomes: night = fundo, coal = cartão, cream = texto, gold = destaque (madeira), sand = detalhe.
+*/
+:root {
+  --c-bg: #f7f4ef;
+  --c-fg: #1c1916;
+  --c-card: #fdfbf8;
+  --c-line: rgba(28, 25, 22, 0.1);
+  --c-accent: #8b6240;
+  --c-detail: #625b53;
+}
+.tone-dark {
+  --c-bg: #1c1916;
+  --c-fg: #f4efe8;
+  --c-card: #26221e;
+  --c-line: rgba(244, 239, 232, 0.12);
+  --c-accent: #c89c72;
+  --c-detail: #b3aa9f;
+}
+
+@theme inline {
+  --color-night: var(--c-bg);
+  --color-coal: var(--c-card);
+  --color-cream: var(--c-fg);
+  --color-line: var(--c-line);
+  --color-gold: var(--c-accent);
+  --color-wine: var(--c-accent);
+  --color-sand: var(--c-detail);
+  --color-ink: #1c1916;
+  --color-paper: #f7f4ef;
+  --color-wood: #8b6240;
+  --color-woodlight: #c89c72;
+  --color-olive: #6e7550;
+  --font-sans: var(--font-inter), "Inter", system-ui, sans-serif;
+  --font-display: var(--font-forum), "Forum", Georgia, serif;
+}
+
+body {
+  background: var(--c-bg);
+  color: var(--c-fg);
+  font-family: var(--font-sans);
+}
+.tone-dark {
+  background: var(--c-bg);
+  color: var(--c-fg);
+}
+
+section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+@media (pointer: fine) {
+  html.lenis,
+  html.lenis body,
+  html.lenis a,
+  html.lenis button,
+  html.lenis select,
+  html.lenis input,
+  html.lenis textarea {
+    cursor: none;
+  }
+}
+
+@layer components {
+  /* versalete serifada da referência */
+  .t-display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+    line-height: 1.02;
+  }
+  .t-hero {
+    font-size: clamp(2.4rem, 5.4vw, 4.9rem);
+  }
+  .t-h1 {
+    font-size: clamp(2rem, 4vw, 3.4rem);
+  }
+  .t-h3 {
+    font-size: clamp(1.3rem, 2vw, 1.8rem);
+  }
+  .pill {
+    display: inline-flex;
+    border-radius: 999px;
+    background: rgba(139, 98, 64, 0.12);
+    padding: 0.28rem 0.75rem;
+    font-size: 0.72rem;
+    font-weight: 500;
+  }
+  .tone-dark .pill {
+    background: rgba(200, 156, 114, 0.16);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    border-radius: 999px;
+    padding: 0.75rem 1.3rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition:
+      background-color 0.35s,
+      color 0.35s,
+      transform 0.35s,
+      box-shadow 0.35s;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  .btn-dark {
+    background: #1c1916;
+    color: #f7f4ef;
+  }
+  .btn-dark:hover {
+    box-shadow: 0 12px 30px -12px rgba(28, 25, 22, 0.6);
+  }
+  .btn-wood {
+    background: #8b6240;
+    color: #fdfbf8;
+  }
+  .btn-wood:hover {
+    background: #77532f;
+  }
+  .btn-light {
+    background: #f7f4ef;
+    color: #1c1916;
+  }
+  .btn-line {
+    border: 1px solid var(--c-line);
+  }
+  .btn-line:hover {
+    border-color: var(--c-fg);
+  }
+  /* cartão de vidro claro, como os da referência */
+  .glass {
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.5));
+    box-shadow: 0 20px 50px -30px rgba(122, 86, 54, 0.35);
+    border-radius: 18px;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* trecho entre *asteriscos* nos títulos (Split): no tom madeira */
+.t-serif {
+  color: var(--c-accent);
+}
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes riseIn {
+  from {
+    transform: translateY(110%);
+  }
+  to {
+    transform: none;
+  }
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes ringSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+  .animate-\[marquee_45s_linear_infinite\] {
+    animation: none;
+  }
+}
