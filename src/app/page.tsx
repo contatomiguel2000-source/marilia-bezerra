@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Cursor, RevealImage, SmoothScroll, Split } from "@/components/FX";
 import { BackButton } from "@/components/Nav";
 import { Counter, Reveal } from "@/components/Reveal";
-import { Contact, Faq, Header, Hero, Highlights, Overlays, Partners, Process, Projects, Reels, Services, Testimonials, Tilt, VideoBanner } from "@/components/Site";
+import { Contact, Faq, Header, Hero, Highlights, Mosaic, Overlays, Partners, Process, Projects, Reels, Services, Testimonials, Tilt, VideoBanner } from "@/components/Site";
 import { nav, stats, studio } from "@/lib/data";
 import { asset } from "@/lib/base-path";
 import { wrap } from "@/lib/ui";
@@ -76,6 +76,13 @@ export default function Home() {
             <Head label="Projetos" title="Espaços com *alma e história*" text="Arraste, use as setas ou clique nas laterais. Abra o projeto para ver todas as imagens e os vídeos." />
           </div>
           <Projects />
+        </section>
+
+        <section id="galeria" data-title="Galeria" className="py-16 md:py-24">
+          <div className={wrap}>
+            <Head label="Galeria" title="Detalhes que *contam histórias*" text="Um mosaico de ambientes de vários projetos. Clique em uma foto para abrir o projeto inteiro." />
+            <Mosaic />
+          </div>
         </section>
 
         <section className="py-10 md:py-14">

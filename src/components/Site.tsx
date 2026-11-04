@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { byId, faq, heroCards, nav, partners, projects, reels, services, steps, studio, testimonials } from "@/lib/data";
+import { byId, faq, heroCards, mosaic, nav, partners, projects, reels, services, steps, studio, testimonials } from "@/lib/data";
 import { stories, type Story } from "@/lib/stories";
 import { asset } from "@/lib/base-path";
 import { sizes } from "@/lib/sizes";
@@ -267,9 +267,13 @@ export function Projects() {
   const drag = useRef<number | null>(null);
   const [hold, setHold] = useState(false);
   const [ref, inView] = useInView<HTMLDivElement>(0.3);
-  // gira sozinho a cada 4,5 s; pausa com o mouse em cima, ao arrastar ou com o foco do teclado
+  /*
+    Gira sozinho a cada 4,5 s, sempre (pedido do cliente): só pausa enquanto a pessoa arrasta.
+    Não pausa no hover nem no foco: o carrossel ocupa quase a tela e o foco ficava preso depois de clicar nas setas.
+    Clicar ou arrastar muda o índice, e isso reinicia a contagem.
+  */
   useEffect(() => {
-    if (hold || !inView || reduced()) return;
+    if (hold || !inView) return;
     const id = setTimeout(() => go(1), 4500);
     return () => clearTimeout(id);
   }, [i, hold, inView, go]);
@@ -278,12 +282,13 @@ export function Projects() {
     <div ref={ref}>
       <div
         className="relative h-[24rem] touch-pan-y select-none [perspective:1800px] sm:h-[28rem] md:h-[34rem]"
-        onPointerEnter={(e) => e.pointerType === "mouse" && setHold(true)}
-        onPointerLeave={() => setHold(false)}
-        onFocus={() => setHold(true)}
-        onBlur={() => setHold(false)}
-        onPointerDown={(e) => (drag.current = e.clientX)}
+        onPointerDown={(e) => {
+          drag.current = e.clientX;
+          setHold(true);
+        }}
+        onPointerCancel={() => setHold(false)}
         onPointerUp={(e) => {
+          setHold(false);
           if (drag.current === null) return;
           const dx = e.clientX - drag.current;
           drag.current = null;
@@ -769,5 +774,51 @@ export function Contact() {
         </button>
       </form>
     </div>
+  );
+}
+
+/* ---------- galeria em mosaico: quadros de vários projetos, lado a lado e em colunas de alturas diferentes ---------- */
+export function Mosaic() {
+  const [all, setAll] = useState(false);
+  const list = all ? mosaic : mosaic.slice(0, 16);
+  return (
+    <>
+      <div className="columns-2 gap-3 md:columns-3 md:gap-4 lg:columns-4">
+        {list.map((m, k) => (
+          <MosaicTile key={m.src} m={m} k={k} />
+        ))}
+      </div>
+      {!all && (
+        <div className="mt-10 flex justify-center">
+          <button type="button" onClick={() => setAll(true)} className="btn btn-dark">
+            Ver mais fotos <IconPlus className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+function MosaicTile({ m, k }: { m: (typeof mosaic)[number]; k: number }) {
+  const [ref, v] = useInView<HTMLButtonElement>(0.15);
+  const p = byId(m.project);
+  const [w, h] = sizes[m.src] ?? [1440, 1800];
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={() => (m.video ? openVideo(m.video[0], m.video[1]) : openProject(m.project, m.k))}
+      data-cursor={m.video ? "Assistir" : "Ampliar"}
+      className="group relative mb-3 block w-full break-inside-avoid overflow-hidden rounded-[14px] bg-coal text-left transition-[opacity,transform] duration-[1s] ease-[cubic-bezier(0.16,1,0.3,1)] md:mb-4"
+      style={{ opacity: v ? 1 : 0, transform: v ? "none" : "translateY(40px) scale(0.97)", transitionDelay: `${(k % 4) * 90}ms` }}
+    >
+      <Image src={asset(m.src)} alt={`${p.title}: foto do projeto`} width={w} height={h} quality={92} sizes="(min-width: 1024px) 290px, (min-width: 768px) 33vw, 50vw" className="h-auto w-full transition-transform duration-[1.2s] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.06]" />
+      <span className="absolute inset-0 bg-[linear-gradient(180deg,transparent_55%,rgba(28,25,22,0.75)_100%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+      <span className="absolute inset-x-3 bottom-3 translate-y-2 text-paper opacity-0 transition-[opacity,transform] duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+        <span className="block text-[0.65rem] tracking-[0.14em] uppercase opacity-80">{m.video ? "Vídeo" : p.kind}</span>
+        <span className="font-display block text-[1.05rem] uppercase leading-tight">{p.title}</span>
+      </span>
+      {m.video && <span className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-paper/90 text-[0.65rem] text-ink">▶</span>}
+    </button>
   );
 }
