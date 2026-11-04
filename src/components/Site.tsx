@@ -265,11 +265,23 @@ export function Projects() {
   const n = projects.length;
   const go = useCallback((d: number) => setI((v) => (v + d + n) % n), [n]);
   const drag = useRef<number | null>(null);
+  const [hold, setHold] = useState(false);
+  const [ref, inView] = useInView<HTMLDivElement>(0.3);
+  // gira sozinho a cada 4,5 s; pausa com o mouse em cima, ao arrastar ou com o foco do teclado
+  useEffect(() => {
+    if (hold || !inView || reduced()) return;
+    const id = setTimeout(() => go(1), 4500);
+    return () => clearTimeout(id);
+  }, [i, hold, inView, go]);
   const p = projects[i];
   return (
-    <div>
+    <div ref={ref}>
       <div
         className="relative h-[24rem] touch-pan-y select-none [perspective:1800px] sm:h-[28rem] md:h-[34rem]"
+        onPointerEnter={(e) => e.pointerType === "mouse" && setHold(true)}
+        onPointerLeave={() => setHold(false)}
+        onFocus={() => setHold(true)}
+        onBlur={() => setHold(false)}
         onPointerDown={(e) => (drag.current = e.clientX)}
         onPointerUp={(e) => {
           if (drag.current === null) return;
@@ -296,7 +308,7 @@ export function Projects() {
               tabIndex={d === 0 ? 0 : -1}
               aria-label={d === 0 ? `Abrir ${x.title}` : `Mostrar ${x.title}`}
               data-cursor={d === 0 ? "Abrir" : "Ver"}
-              className="absolute left-1/2 top-0 h-full w-[68vw] max-w-[26rem] -translate-x-1/2 overflow-hidden rounded-[20px] bg-coal shadow-[0_40px_80px_-40px_rgba(60,40,20,0.6)] transition-[transform,opacity,filter] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
+              className="absolute left-1/2 top-0 h-full w-[68vw] max-w-[26rem] overflow-hidden rounded-[20px] bg-coal shadow-[0_40px_80px_-40px_rgba(60,40,20,0.6)] transition-[transform,opacity,filter] duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
               style={{
                 transform: `translateX(calc(-50% + ${d * 58}%)) translateZ(${-ad * 160}px) rotateY(${-d * 28}deg)`,
                 zIndex: 20 - ad,
@@ -315,19 +327,24 @@ export function Projects() {
           );
         })}
       </div>
-      <div className="mx-auto mt-10 grid max-w-[calc(48rem+2rem)] items-start gap-6 px-4 md:grid-cols-[1fr_auto]">
+      <div className="mx-auto mt-10 flex max-w-[calc(40rem+2rem)] flex-col items-center gap-6 px-4 text-center">
         <div key={p.id} className="animate-[fadeUp_0.6s_both]">
           <p className="text-[0.8rem] text-sand">
             {String(i + 1).padStart(2, "0")} / {String(n).padStart(2, "0")} · {p.kind} · {p.place}
           </p>
           <h3 className="t-display t-h3 mt-2">{p.title}</h3>
-          <p className="mt-2 leading-relaxed text-sand">{p.text}</p>
+          <p className="mx-auto mt-2 max-w-[36rem] leading-relaxed text-sand">{p.text}</p>
           <button type="button" onClick={() => openProject(p.id)} className="btn btn-dark mt-5">
             Ver {p.shots.length > 1 ? `${p.shots.length} imagens` : "o projeto"}
             {p.videos?.length ? " e vídeo" : ""} <IconRight className="h-3.5 w-3.5" />
           </button>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <div className="mr-2 hidden gap-1 sm:flex" aria-hidden>
+            {projects.map((x, k) => (
+              <span key={x.id} className={`h-1.5 rounded-full transition-all duration-500 ${k === i ? "w-6 bg-wood" : "w-1.5 bg-cream/20"}`} />
+            ))}
+          </div>
           <button type="button" onClick={() => go(-1)} className="flex h-12 w-12 rotate-180 items-center justify-center rounded-full border border-line hover:border-cream" aria-label="Projeto anterior">
             <IconRight className="h-4 w-4" />
           </button>
